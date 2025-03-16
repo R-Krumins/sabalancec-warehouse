@@ -27,12 +27,16 @@ func (s *Server) Run() {
 	mux.Handle("GET /api/product/{id}", makeHttpHandlerFunc(s.handleGetProductById))
 	mux.Handle("POST /api/product", makeHttpHandlerFunc(s.handleCreateProduct))
 
+	// Static file serving for images
+	fs := http.FileServer(http.Dir("./static"))
+	mux.Handle("GET /static/", http.StripPrefix("/static/", fs))
+
 	fmt.Printf("Server listening on port %s...\n", s.listenAddr)
 	http.ListenAndServe(s.listenAddr, mux)
 }
 
 func (s *Server) handleCreateProduct(w http.ResponseWriter, r *http.Request) error {
-	product := new(Product)
+	product := new(ProductFull)
 
 	if err := json.NewDecoder(r.Body).Decode(product); err != nil {
 		return err

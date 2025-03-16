@@ -1,6 +1,6 @@
 package main
 
-type Product struct {
+type ProductFull struct {
 	Id            int     `json:"id"`
 	Name          string  `json:"name"`
 	Price         float32 `json:"price"`
@@ -10,6 +10,13 @@ type Product struct {
 	AmountInStock int     `json:"amountInStock"`
 	HasAllergens  bool    `json:"hasAllergens"`
 	Rating        float32 `json:"rating"`
+}
+
+type ProductSimple struct {
+	Id       int    `json:"id"`
+	Name     string `json:"name"`
+	Category string `json:"category"`
+	Image    string `json:"image"`
 }
 
 type Res struct {

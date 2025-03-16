@@ -9,9 +9,9 @@ import (
 )
 
 type Storage interface {
-	CreateProduct(*Product) error
-	GetProduct() ([]Product, error)
-	GetProductById(int) (*Product, error)
+	CreateProduct(*ProductFull) error
+	GetProduct() ([]ProductSimple, error)
+	GetProductById(int) (*ProductFull, error)
 }
 
 type SQLiteStorage struct {
@@ -70,7 +70,7 @@ func CreateNewSqliteDB(dbPath string) error {
 	return nil
 }
 
-func (s *SQLiteStorage) CreateProduct(p *Product) error {
+func (s *SQLiteStorage) CreateProduct(p *ProductFull) error {
 	query := `INSERT INTO products
         (name, price, category, image, amount_sold, amount_in_stock, has_allergens, rating)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`
@@ -89,19 +89,17 @@ func (s *SQLiteStorage) CreateProduct(p *Product) error {
 	return nil
 }
 
-func (s *SQLiteStorage) GetProduct() ([]Product, error) {
-	rows, err := s.db.Query("SELECT * FROM products")
+func (s *SQLiteStorage) GetProduct() ([]ProductSimple, error) {
+	rows, err := s.db.Query("SELECT id, name, category, image FROM products")
 	if err != nil {
 		return nil, err
 	}
 
-	products := make([]Product, 0)
+	products := make([]ProductSimple, 0)
 	for rows.Next() {
-		product := new(Product)
+		product := new(ProductSimple)
 		err := rows.Scan(
-			&product.Id, &product.Name, &product.Price, &product.Category,
-			&product.Image, &product.AmountSold, &product.AmountInStock,
-			&product.HasAllergens, &product.Rating)
+			&product.Id, &product.Name, &product.Category, &product.Image)
 		if err != nil {
 			return nil, err
 		}
@@ -111,13 +109,13 @@ func (s *SQLiteStorage) GetProduct() ([]Product, error) {
 
 }
 
-func (s *SQLiteStorage) GetProductById(id int) (*Product, error) {
+func (s *SQLiteStorage) GetProductById(id int) (*ProductFull, error) {
 	rows, err := s.db.Query("SELECT * FROM products WHERE id = ?", id)
 	if err != nil {
 		return nil, err
 	}
 
-	product := new(Product)
+	product := new(ProductFull)
 	for rows.Next() {
 		err = rows.Scan(
 			&product.Id, &product.Name, &product.Price, &product.Category,
