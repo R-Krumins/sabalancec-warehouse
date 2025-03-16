@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse API Documentation</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Section Styles */
+        div {
+            background-color: white;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+        }
+
+        p {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        pre {
+            background-color: #282c34;
+            color: #f1f1f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* GET Request Styling */
+        .get {
+            color: green;
+            font-weight: bold;
+        }
+
+        /* Link Styling */
+        a {
+            color: #0077cc;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+   <h1>Sabalancec Warehouse API Documentation</h1>
+   
+   <div>
+        <h2><span class="get">GET</span> /api/product</h2>
+        <p>Response Example:</p>
+        <pre>
+{
+    "data": [
+        {
+            "id": 34,
+            "name": "Almonds",
+            "category": "Nuts",
+            "image": "static/almonds.png"
+        },
+        {
+            "id": 35,
+            "name": "Banana",
+            "category": "Fruits",
+            "image": "static/bannana.png"
+        },
+        {
+            "id": 36,
+            "name": "Brazil Nuts",
+            "category": "Nuts",
+            "image": "static/brazilnuts.png"
+        }
+    ]
+}
+        </pre>
+   </div>
+
+   <div>
+        <h2><span class="get">GET</span> /api/product/{id}</h2>
+        <p>Response Example:</p>
+        <pre>
+{
+    "data": {
+        "id": 38,
+        "name": "Dragon Fruit",
+        "price": 7.99,
+        "category": "Fruits",
+        "image": "static/dragonfruit.png",
+        "amountSold": 0,
+        "amountInStock": 50,
+        "hasAllergens": false,
+        "rating": 0
+    }
+}
+        </pre>
+    </div>
+
+    <div>
+        <h2><span class="get">GET</span> /static/{image}</h2>
+        <p>Response Example:</p>
+        <pre>
+janiskiploks.png
+        </pre>
+    </div>
+
+</body>
+</html>

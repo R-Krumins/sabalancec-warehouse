@@ -30,24 +30,28 @@ func (s *Server) Run() {
 	// Static file serving for images
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("GET /static/", http.StripPrefix("/static/", fs))
+	mux.Handle("GET /", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/index.html")
+	}))
 
 	fmt.Printf("Server listening on port %s...\n", s.listenAddr)
 	http.ListenAndServe(s.listenAddr, mux)
 }
 
 func (s *Server) handleCreateProduct(w http.ResponseWriter, r *http.Request) error {
-	product := new(ProductFull)
+	return WriteJSON(w, http.StatusForbidden, "Forbidden", nil)
+	// product := new(ProductFull)
 
-	if err := json.NewDecoder(r.Body).Decode(product); err != nil {
-		return err
-	}
+	// if err := json.NewDecoder(r.Body).Decode(product); err != nil {
+	// 	return err
+	// }
 
-	if err := s.store.CreateProduct(product); err != nil {
-		return err
-	}
+	// if err := s.store.CreateProduct(product); err != nil {
+	// 	return err
+	// }
 
-	return WriteJSON(w, http.StatusOK,
-		fmt.Sprintf("New product %s created", product.Name), product)
+	// return WriteJSON(w, http.StatusOK,
+	// 	fmt.Sprintf("New product %s created", product.Name), product)
 }
 
 func (s *Server) handleGetProduct(w http.ResponseWriter, r *http.Request) error {
