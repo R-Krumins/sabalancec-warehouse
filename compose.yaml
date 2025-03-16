@@ -1,0 +1,13 @@
+services:
+  warehouse:
+    build: .
+    ports:
+      - "${PORT}:3000"
+    volumes:
+      - warehouse-data:/data
+    restart: unless-stopped
+
+volumes:
+  warehouse-data:
+    driver: local
+

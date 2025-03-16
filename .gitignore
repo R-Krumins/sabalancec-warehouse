@@ -1,0 +1,9 @@
+# sqlite db
+*.db
+
+# binaries
+server
+warehouse
+
+# env
+.env
