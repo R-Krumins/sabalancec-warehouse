@@ -28,7 +28,9 @@ CREATE TABLE products (
 -- Create Allergens Table
 CREATE TABLE allergens (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT UNIQUE NOT NULL
+    name TEXT UNIQUE NOT NULL,
+    image TEXT,
+	info TEXT
 );
 
 -- Create Product-Allergens Relationship Table

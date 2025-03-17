@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -12,6 +13,9 @@ type Storage interface {
 	CreateProduct(*ProductFull) error
 	GetProduct() ([]ProductSimple, error)
 	GetProductById(int) (*ProductFull, error)
+
+	GetAllergen() ([]AllergenSimple, error)
+	GetAllergenByID(id int) (*AllergenFull, error)
 }
 
 type SQLiteStorage struct {
@@ -55,18 +59,28 @@ func CreateNewSqliteDB(dbPath string) error {
 	}
 	defer db.Close()
 
-	// Read and execute createDB.sql
-	sqlBytes, err := os.ReadFile("./createDB.sql")
-	if err != nil {
-		return fmt.Errorf("failed to read createDB.sql: %w", err)
+	if err := executeSQLFile(db, "./sql/createDB.sql"); err != nil {
+		return err
 	}
 
-	_, err = db.Exec(string(sqlBytes))
-	if err != nil {
-		return fmt.Errorf("failed to execute createDB.sql: %w", err)
+	if err := executeSQLFile(db, "./sql/insertData.sql"); err != nil {
+		return err
 	}
 
 	fmt.Println("New database created and initialized")
+	return nil
+}
+
+func executeSQLFile(db *sql.DB, file string) error {
+	sqlBytes, err := os.ReadFile(file)
+	if err != nil {
+		return fmt.Errorf("failed to read %s: %w", file, err)
+	}
+	_, err = db.Exec(string(sqlBytes))
+	if err != nil {
+		return fmt.Errorf("failed to execute %s: %w", file, err)
+	}
+
 	return nil
 }
 
@@ -129,4 +143,59 @@ func (s *SQLiteStorage) GetProductById(id int) (*ProductFull, error) {
 
 	return nil, fmt.Errorf("no product with id %d", id)
 
+}
+
+func (s *SQLiteStorage) GetAllergen() ([]AllergenSimple, error) {
+	rows, err := s.db.Query("SELECT id, name, image FROM allergens")
+	if err != nil {
+		return nil, err
+	}
+
+	allergens := make([]AllergenSimple, 0)
+	for rows.Next() {
+		allergen := new(AllergenSimple)
+		err := rows.Scan(
+			&allergen.Id, &allergen.Name, &allergen.Image)
+		if err != nil {
+			return nil, err
+		}
+		allergens = append(allergens, *allergen)
+	}
+	return allergens, nil
+}
+
+func (s *SQLiteStorage) GetAllergenByID(id int) (*AllergenFull, error) {
+	row := s.db.QueryRow("SELECT id, name, image, info FROM allergens WHERE id = ?", id)
+
+	allergen := new(AllergenFull)
+
+	// Create a variable to store the JSON string
+	// The json string should be formatted as "section:text","section:text","section:text"
+	var infoJSON string
+
+	err := row.Scan(&allergen.Id, &allergen.Name, &allergen.Image, &infoJSON)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("no allergen with id %d", id)
+		}
+		return nil, err
+	}
+
+	// Parse the JSON string into a map first
+	var infoMap map[string]string
+	err = json.Unmarshal([]byte(infoJSON), &infoMap)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert the map to an array of AllergenInfo
+	allergen.Info = make([]AllergenInfo, 0, len(infoMap))
+	for section, text := range infoMap {
+		allergen.Info = append(allergen.Info, AllergenInfo{
+			Section: section,
+			Text:    text,
+		})
+	}
+
+	return allergen, nil
 }

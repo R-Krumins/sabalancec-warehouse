@@ -27,6 +27,9 @@ func (s *Server) Run() {
 	mux.Handle("GET /api/product/{id}", makeHttpHandlerFunc(s.handleGetProductById))
 	mux.Handle("POST /api/product", makeHttpHandlerFunc(s.handleCreateProduct))
 
+	mux.Handle("GET /api/allergen", makeHttpHandlerFunc(s.handleGetAllergen))
+	mux.Handle("GET /api/allergen/{id}", makeHttpHandlerFunc(s.handleGetAllergenById))
+
 	// Static file serving for images
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("GET /static/", http.StripPrefix("/static/", fs))
@@ -64,6 +67,16 @@ func (s *Server) handleGetProduct(w http.ResponseWriter, r *http.Request) error 
 	return WriteJSON(w, http.StatusOK, "", products)
 }
 
+func (s *Server) handleGetAllergen(w http.ResponseWriter, r *http.Request) error {
+	products, err := s.store.GetAllergen()
+
+	if err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, "", products)
+}
+
 func (s *Server) handleGetProductById(w http.ResponseWriter, r *http.Request) error {
 	id, err := getId(r)
 	if err != nil {
@@ -71,6 +84,20 @@ func (s *Server) handleGetProductById(w http.ResponseWriter, r *http.Request) er
 	}
 
 	product, err := s.store.GetProductById(id)
+	if err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, "", product)
+}
+
+func (s *Server) handleGetAllergenById(w http.ResponseWriter, r *http.Request) error {
+	id, err := getId(r)
+	if err != nil {
+		return err
+	}
+
+	product, err := s.store.GetAllergenByID(id)
 	if err != nil {
 		return err
 	}

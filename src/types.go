@@ -19,6 +19,24 @@ type ProductSimple struct {
 	Image    string `json:"image"`
 }
 
+type AllergenInfo struct {
+	Section string `json:"section"`
+	Text    string `json:"text"`
+}
+
+type AllergenFull struct {
+	Id    int            `json:"id"`
+	Name  string         `json:"name"`
+	Image string         `json:"image"`
+	Info  []AllergenInfo `json:"info"`
+}
+
+type AllergenSimple struct {
+	Id    int    `json:"id"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
+}
+
 type Res struct {
 	Success bool   `json:"success"`
 	Msg     string `json:"msg"`
