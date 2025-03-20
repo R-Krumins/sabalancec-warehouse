@@ -30,6 +30,8 @@ func (s *Server) Run() {
 	mux.Handle("GET /api/allergen", makeHttpHandlerFunc(s.handleGetAllergen))
 	mux.Handle("GET /api/allergen/{id}", makeHttpHandlerFunc(s.handleGetAllergenById))
 
+	mux.Handle("POST /api/user", makeHttpHandlerFunc(s.handleCreateUser))
+
 	// Static file serving for images
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("GET /static/", http.StripPrefix("/static/", fs))
@@ -103,6 +105,10 @@ func (s *Server) handleGetAllergenById(w http.ResponseWriter, r *http.Request) e
 	}
 
 	return WriteJSON(w, http.StatusOK, "", product)
+}
+
+func (s *Server) handleCreateUser(w http.ResponseWriter, r *http.Request) error {
+	return WriteJSON(w, http.StatusOK, "New user registered", nil)
 }
 
 type apiFunc func(http.ResponseWriter, *http.Request) error
